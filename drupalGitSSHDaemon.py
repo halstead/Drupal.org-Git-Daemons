@@ -33,6 +33,7 @@ import json
 from config import config
 from service import Service
 from service.protocols import AuthProtocol
+from drupalpass import DrupalHash
 
 class DrupalMeta(object):
     def __init__(self):
@@ -390,17 +391,29 @@ class GitPasswordChecker(object):
         self.meta = meta
 
     def requestAvatarId(self, credentials):
-        self.meta.password = hashlib.md5(credentials.password).hexdigest()
-        service = Service(AuthProtocol('drupalorg-vcs-auth-check-user-pass'))
-        service.request_bool({"username":credentials.username},
-                             {"password":self.meta.password})
-        def auth_callback(result):
-            if result:
-                return credentials.username
-            else:
-                return Failure(UnauthorizedLogin(credentials.username))
-        service.addCallback(auth_callback)
-        return service.deferred
+        def fetchHash(credentials):
+            service = Service(AuthProtocol('drupalorg-vcs-auth-fetch-user-hash'))
+            service.request_json({"username":credentials.username})
+            def auth_callback(result):
+                if result:
+                    self.meta.password = DrupalHash(result, credentials.password).get_hash()
+                    return checkAuth(credentials)
+            service.addCallback(auth_callback)
+            return service.deferred
+
+        def checkAuth(credentials):
+            service = Service(AuthProtocol('drupalorg-vcs-auth-check-user-pass'))
+            service.request_bool({"username":credentials.username},
+                                 {"password":self.meta.password})
+            def auth_callback(result):
+                if result:
+                    print "SUCCESS--"*88
+                    return credentials.username
+                else:
+                    return Failure(UnauthorizedLogin(credentials.username))
+            service.addCallback(auth_callback)
+            return service.deferred
+        return fetchHash(credentials)
 
 class GitServer(SSHFactory):
     authmeta = DrupalMeta()
