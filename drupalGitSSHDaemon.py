@@ -407,7 +407,6 @@ class GitPasswordChecker(object):
                                  {"password":self.meta.password})
             def auth_callback(result):
                 if result:
-                    print "SUCCESS--"*88
                     return credentials.username
                 else:
                     return Failure(UnauthorizedLogin(credentials.username))
