@@ -66,8 +66,9 @@ class DrupalHash:
         return output
 
     def rehash(self, stored_hash, password):
+        hash_length = len(stored_hash)
         # Plain Drupal 6 compatibility
-        if len(stored_hash) == 32 and stored_hash.find('$') == -1:
+        if hash_length == 32 and stored_hash.find('$') == -1:
             return hashlib.md5(password).hexdigest()
         # Drupal 7 and phpass compatible passwords
         if stored_hash[0:2] == 'U$':
@@ -86,7 +87,9 @@ class DrupalHash:
         else:
             # We don't know how to deal with this hash type
             return False
-        return hash_prefix + hash_str
+        hash_str = hash_prefix + hash_str
+        # Only return the length that Drupal has stored
+        return hash_str[:hash_length]
 
 if __name__ == "__main__":
     ha = '$S$D5z1Wm4bevjS5EQ3OdB.lI0NFTnCyIuD6VFHs5fkdjFHo0lvsdmv'
