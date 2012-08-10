@@ -66,21 +66,27 @@ class DrupalHash:
         return output
 
     def rehash(self, stored_hash, password):
-        # Drupal 6 compatibility
+        # Plain Drupal 6 compatibility
         if len(stored_hash) == 32 and stored_hash.find('$') == -1:
             return hashlib.md5(password).hexdigest()
-        # Drupal 7
+        # Drupal 7 and phpass compatible passwords
         if stored_hash[0:2] == 'U$':
+            # Old password wrapped for compatibily 
+            hash_prefix = 'U'
             stored_hash = stored_hash[1:]
             password = hashlib.md5(password).hexdigest()
+        else:
+            # Password has been reset since phpass support was added
+            hash_prefix = ''
         hash_type = stored_hash[0:3]
         if hash_type == '$S$':
             hash_str = self.password_crypt('sha512', password, stored_hash)
         elif hash_type == '$H$' or hash_type == '$P$':
             hash_str = self.password_crypt('md5', password, stored_hash)
         else:
-            hash_str = False
-        return hash_str
+            # We don't know how to deal with this hash type
+            return False
+        return hash_prefix + hash_str
 
 if __name__ == "__main__":
     ha = '$S$D5z1Wm4bevjS5EQ3OdB.lI0NFTnCyIuD6VFHs5fkdjFHo0lvsdmv'
