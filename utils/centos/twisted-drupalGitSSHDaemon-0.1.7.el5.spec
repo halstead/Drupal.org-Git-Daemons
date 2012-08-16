@@ -56,6 +56,8 @@ cp "twisted-drupalGitSSHDaemon.init" "$RPM_BUILD_ROOT"/etc/init.d/"twisted-drupa
 %attr(0660,root,root) /etc/twisted-keys
 
 %changelog
+* Thu Aug 16 2012 Michael Halstead <halstead@happypunch.com>
+- Added compatiblity with PHPass style hashed passwords
 * Sun Feb 20 2011 Trevor Hardcastle <chizu@spicious.com>
 - Bug fixes around error handling
 - Respect push control settings
