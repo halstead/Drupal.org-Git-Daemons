@@ -288,7 +288,12 @@ class GitSession(object):
         repopath, user, auth_service = auth_values
         sh = self.user.shell
         repo_id = auth_service["repo_id"]
-        
+
+        if proto.session.localClosed:
+            # The channel has been closed while we were performing the
+            # authentication request, exit.
+            return
+
         env = {}
         if user:
             # The UID is known, populate the environment
@@ -297,11 +302,19 @@ class GitSession(object):
             env['VERSION_CONTROL_VCS_AUTH_DATA'] = json.dumps(auth_service)
             
         command = ' '.join(argv[:-1] + ["'{0}'".format(repopath)])
-        reactor.spawnProcess(proto, sh, (sh, '-c', command), env=env)
+        self.pty = reactor.spawnProcess(proto, sh, (sh, '-c', command), env=env)
 
-    def eofReceived(self): pass
+    def eofReceived(self):
+        if self.pty:
+            self.pty.closeStdin()
 
-    def closed(self): pass
+    def closed(self):
+        if self.pty:
+            try:
+                self.pty.signalProcess('HUP')
+            except (OSError,ProcessExitedAlready):
+                pass
+            self.pty.loseConnection()
 
 
 class GitConchUser(ConchUser):
