@@ -17,20 +17,21 @@ Requires(preun): /sbin/chkconfig, /sbin/service
 Git SSH daemon using Python Twisted
 
 %prep
-%setup
+%setup -q
+
 %build
 
 %install
 [ ! -z "$RPM_BUILD_ROOT" -a "$RPM_BUILD_ROOT" != '/' ] 		&& rm -rf "$RPM_BUILD_ROOT"
 mkdir -p "$RPM_BUILD_ROOT"/etc/twisted-taps
-mkdir -p "$RPM_BUILD_ROOT"/etc/init.d
-mkdir -p "$RPM_BUILD_ROOT"/var/lib/twisted-taps
+mkdir -p "$RPM_BUILD_ROOT"%{_initrddir}
+mkdir -p "$RPM_BUILD_ROOT"%{_libdir}/twisted-taps
 mkdir -p "$RPM_BUILD_ROOT"/etc/twisted-keys
 cp "drupaldaemons.cnf.default" "$RPM_BUILD_ROOT"/etc/drupaldaemons.cnf
 cp -r "rundir" "$RPM_BUILD_ROOT"/etc/twisted-taps/twisted-drupalGitSSHDaemon
 cp "git-error" "$RPM_BUILD_ROOT"/etc/twisted-taps/twisted-drupalGitSSHDaemon/
 cp "drupalGitSSHDaemon.tac" "$RPM_BUILD_ROOT"/etc/twisted-taps/
-cp "twisted-drupalGitSSHDaemon.init" "$RPM_BUILD_ROOT"/etc/init.d/"twisted-drupalGitSSHDaemon"
+cp "twisted-drupalGitSSHDaemon.init" "$RPM_BUILD_ROOT"%{_initrddir}/"twisted-drupalGitSSHDaemon"
 
 %clean
 [ ! -z "$RPM_BUILD_ROOT" -a "$RPM_BUILD_ROOT" != '/' ] 		&& rm -rf "$RPM_BUILD_ROOT"
@@ -49,7 +50,8 @@ fi
 
 %files
 %defattr(-,root,root)
-%attr(0755,root,root) /etc/init.d/twisted-drupalGitSSHDaemon
+%attr(0755,root,root) %{_initrddir}/twisted-drupalGitSSHDaemon
+%dir %{_libdir}/twisted-taps
 %attr(0660,root,root) /etc/twisted-taps/drupalGitSSHDaemon.tac
 %attr(0660,root,root) /etc/drupaldaemons.cnf
 %attr(0660,root,root) /etc/twisted-taps/twisted-drupalGitSSHDaemon/config.py
