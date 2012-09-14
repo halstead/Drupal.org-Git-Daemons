@@ -14,7 +14,7 @@ Requires(post): /sbin/chkconfig, openssh
 Requires(preun): /sbin/chkconfig, /sbin/service
 
 %description
-Patched from the "automatically created by tap2rpm" rpm
+Git SSH daemon using Python Twisted
 
 %prep
 %setup
