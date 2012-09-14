@@ -8,8 +8,11 @@ License:    Unknown
 Group:      Networking/Daemons
 Source:     twisted-drupalGitSSHDaemon-%{version}.tar.bz2
 BuildRoot:  %{_tmppath}/%{name}-%{version}-root
-Requires:   python26-twisted
 BuildArch:  noarch
+Requires:   python26-twisted
+Requires(post): /sbin/chkconfig
+Requires(preun): /sbin/chkconfig, /sbin/service
+Requires(postun): /sbin/service
 
 %description
 Patched from the "automatically created by tap2rpm" rpm
@@ -37,10 +40,10 @@ cp "twisted-drupalGitSSHDaemon.init" "$RPM_BUILD_ROOT"/etc/init.d/"twisted-drupa
 /usr/bin/ssh-keygen -t rsa -f /etc/twisted-keys/default -P ""
 /sbin/chkconfig --add twisted-drupalGitSSHDaemon
 /sbin/chkconfig --level 35 twisted-drupalGitSSHDaemon
-/etc/init.d/twisted-drupalGitSSHDaemon start
+/sbin/service twisted-drupalGitSSHDaemon start
 
 %preun
-/etc/init.d/twisted-drupalGitSSHDaemon stop
+/sbin/service twisted-drupalGitSSHDaemon stop
 /sbin/chkconfig --del twisted-drupalGitSSHDaemon
 
 %files
