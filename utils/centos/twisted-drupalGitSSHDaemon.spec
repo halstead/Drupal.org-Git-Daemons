@@ -10,7 +10,7 @@ Source:     twisted-drupalGitSSHDaemon-%{version}.tar.bz2
 BuildRoot:  %{_tmppath}/%{name}-%{version}-root
 BuildArch:  noarch
 Requires:   python26-twisted
-Requires(post): /sbin/chkconfig
+Requires(post): /sbin/chkconfig, openssh
 Requires(preun): /sbin/chkconfig, /sbin/service
 Requires(postun): /sbin/service
 
