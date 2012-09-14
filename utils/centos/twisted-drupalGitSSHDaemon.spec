@@ -37,15 +37,13 @@ cp "twisted-drupalGitSSHDaemon.init" "$RPM_BUILD_ROOT"/etc/init.d/"twisted-drupa
 
 %post
 if [ $1 -eq 1 ]; then
-  /usr/bin/ssh-keygen -t rsa -f /etc/twisted-keys/default -P ""
+  /usr/bin/ssh-keygen -t rsa -f /etc/twisted-keys/default -P "" >/dev/null 2>&1 || :
   /sbin/chkconfig --add twisted-drupalGitSSHDaemon
-  /sbin/chkconfig --level 35 twisted-drupalGitSSHDaemon
-  /sbin/service twisted-drupalGitSSHDaemon start
 fi
 
 %preun
 if [ $1 -eq 0 ]; then
-  /sbin/service twisted-drupalGitSSHDaemon stop
+  /sbin/service twisted-drupalGitSSHDaemon stop >/dev/null 2>&1 || :
   /sbin/chkconfig --del twisted-drupalGitSSHDaemon
 fi
 
