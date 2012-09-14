@@ -12,7 +12,6 @@ BuildArch:  noarch
 Requires:   python26-twisted
 Requires(post): /sbin/chkconfig, openssh
 Requires(preun): /sbin/chkconfig, /sbin/service
-Requires(postun): /sbin/service
 
 %description
 Patched from the "automatically created by tap2rpm" rpm
@@ -37,14 +36,18 @@ cp "twisted-drupalGitSSHDaemon.init" "$RPM_BUILD_ROOT"/etc/init.d/"twisted-drupa
 [ ! -z "$RPM_BUILD_ROOT" -a "$RPM_BUILD_ROOT" != '/' ] 		&& rm -rf "$RPM_BUILD_ROOT"
 
 %post
-/usr/bin/ssh-keygen -t rsa -f /etc/twisted-keys/default -P ""
-/sbin/chkconfig --add twisted-drupalGitSSHDaemon
-/sbin/chkconfig --level 35 twisted-drupalGitSSHDaemon
-/sbin/service twisted-drupalGitSSHDaemon start
+if [ $1 -eq 1 ]; then
+  /usr/bin/ssh-keygen -t rsa -f /etc/twisted-keys/default -P ""
+  /sbin/chkconfig --add twisted-drupalGitSSHDaemon
+  /sbin/chkconfig --level 35 twisted-drupalGitSSHDaemon
+  /sbin/service twisted-drupalGitSSHDaemon start
+fi
 
 %preun
-/sbin/service twisted-drupalGitSSHDaemon stop
-/sbin/chkconfig --del twisted-drupalGitSSHDaemon
+if [ $1 -eq 0 ]; then
+  /sbin/service twisted-drupalGitSSHDaemon stop
+  /sbin/chkconfig --del twisted-drupalGitSSHDaemon
+fi
 
 %files
 %defattr(-,root,root)
