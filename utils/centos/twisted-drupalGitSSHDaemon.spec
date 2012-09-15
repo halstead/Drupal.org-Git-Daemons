@@ -9,7 +9,7 @@ Group:      Networking/Daemons
 Source:     twisted-drupalGitSSHDaemon-%{version}.tar.bz2
 BuildRoot:  %{_tmppath}/%{name}-%{version}-root
 BuildArch:  noarch
-Requires:   python26-twisted, python26-crypto
+Requires:   python26-twisted, pycrypto26
 Requires(post): /sbin/chkconfig, openssh
 Requires(preun): /sbin/chkconfig, /sbin/service
 
