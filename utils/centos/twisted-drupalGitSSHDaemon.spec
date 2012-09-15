@@ -3,7 +3,7 @@
 Summary:    A TCP server for drupalGitSSHDaemon
 Name:       twisted-drupalGitSSHDaemon
 Version:    0.1.7
-Release:    1
+Release:    2
 License:    Unknown
 Group:      Networking/Daemons
 Source:     twisted-drupalGitSSHDaemon-%{version}.tar.bz2
@@ -29,6 +29,7 @@ mkdir -p "$RPM_BUILD_ROOT"%{_libdir}/twisted-taps
 mkdir -p "$RPM_BUILD_ROOT"/etc/twisted-keys
 cp "drupaldaemons.cnf.default" "$RPM_BUILD_ROOT"/etc/drupaldaemons.cnf
 cp -r "rundir" "$RPM_BUILD_ROOT"/etc/twisted-taps/twisted-drupalGitSSHDaemon
+cp -r "drupalpass" "$RPM_BUILD_ROOT"/etc/twisted-taps/twisted-drupalGitSSHDaemon
 cp "git-error" "$RPM_BUILD_ROOT"/etc/twisted-taps/twisted-drupalGitSSHDaemon/
 cp "drupalGitSSHDaemon.tac" "$RPM_BUILD_ROOT"/etc/twisted-taps/
 cp "twisted-drupalGitSSHDaemon.init" "$RPM_BUILD_ROOT"%{_initrddir}/"twisted-drupalGitSSHDaemon"
@@ -49,19 +50,18 @@ if [ $1 -eq 0 ]; then
 fi
 
 %files
-%defattr(-,root,root)
-%attr(0755,root,root) %{_initrddir}/twisted-drupalGitSSHDaemon
+%defattr(-,root,root,-)
+%{_initrddir}/twisted-drupalGitSSHDaemon
 %dir %{_libdir}/twisted-taps
-%attr(0660,root,root) /etc/twisted-taps/drupalGitSSHDaemon.tac
-%attr(0660,root,root) /etc/drupaldaemons.cnf
-%attr(0660,root,root) /etc/twisted-taps/twisted-drupalGitSSHDaemon/config.py
-%attr(0660,root,root) /etc/twisted-taps/twisted-drupalGitSSHDaemon/drupalGitSSHDaemon.py
-%attr(0755,root,root) /etc/twisted-taps/twisted-drupalGitSSHDaemon/git-error
-%attr(0660,root,root) /etc/twisted-taps/twisted-drupalGitSSHDaemon/service/__init__.py
-%attr(0660,root,root) /etc/twisted-taps/twisted-drupalGitSSHDaemon/service/protocols.py
-%attr(0660,root,root) /etc/twisted-keys
+/etc/twisted-taps/drupalGitSSHDaemon.tac
+%config(noreplace) /etc/drupaldaemons.cnf
+/etc/twisted-taps/twisted-drupalGitSSHDaemon/*
+/etc/twisted-keys
 
 %changelog
+* Fri Sep 14 2012 Jeff Sheltren <jeff@tag1consulting.com>
+- Various spec changes/improvements: use macros, add requires
+
 * Thu Aug 16 2012 Michael Halstead <halstead@happypunch.com>
 - Added compatiblity with PHPass style hashed passwords
 * Sun Feb 20 2011 Trevor Hardcastle <chizu@spicious.com>
