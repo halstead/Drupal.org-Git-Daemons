@@ -2,9 +2,9 @@
 
 Summary:    A TCP server for drupalGitSSHDaemon
 Name:       twisted-drupalGitSSHDaemon
-Version:    0.1.7
-Release:    2
-License:    Unknown
+Version:    0.1.8
+Release:    1
+License:    GPLv2
 Group:      Networking/Daemons
 Source:     twisted-drupalGitSSHDaemon-%{version}.tar.bz2
 BuildRoot:  %{_tmppath}/%{name}-%{version}-root
