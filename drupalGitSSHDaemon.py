@@ -220,7 +220,7 @@ class GitSession(object):
             # access value, and with the 'ALL' value, which == 2. 1 is also
             # valid ('GRANT'), though it should never come back in the current
             # drupal.org implementation state.
-            if not user or not user["access"].in([1,2]):
+            if not user or user["access"] not in [1,2]:
                 error = "You do not have write permissions for the '{0}' repository.".format(projectname)
                 return Failure(ConchError(error))
             elif user["global"]:
