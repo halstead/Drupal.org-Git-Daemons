@@ -47,7 +47,7 @@ class DrupalMeta(object):
         Values and structure returned:
         {username: {uid:int, 
                     repo_id:int, 
-                    access:boolean, 
+                    access:int, 
                     branch_create:boolean, 
                     branch_update:boolean, 
                     branch_delete:boolean, 
@@ -204,34 +204,26 @@ class GitSession(object):
 
         # Check to see if anonymous read access is enabled and if
         # this is a read
-        if (not self.user.meta.anonymousReadAccess or \
-                'git-upload-pack' not in argv[:-1]):
+        if (self.user.meta.anonymousReadAccess and \
+                'git-upload-pack' in argv[:-1]):
+            # Read only command, and anonymous access is enabled
+            return execGitCommand
+        else:
             # First, error out if the project itself is disabled.
             if not auth_service["status"]:
                 error = "Project {0} has been disabled.".format(projectname)
                 return Failure(ConchError(error))
-            # If anonymous access for this type of command is not allowed,
-            # check if the user is a maintainer on this project
-            # global values - d.o issue #1036686
-            # "git":key
-            if self.user.username == "git" and user and not user["global"]:
-                return execGitCommand
-            # Username in maintainers list
-            elif self.user.username not in users:
-                error = "User '{1}' does not have write permissions for repository '{0}'".format(projectname, self.user.username)
+            # Now, deny if the user isn't listed, or doesn't have push access.
+            # See http://drupalcode.org/project/versioncontrol.git/blob/refs/heads/6.x-2.x:/includes/plugins/vcs_auth/VersioncontrolAuthHandlerMappedAccounts.class.php
+            # for an explanation on the values used here. Drupal.org currently
+            # only exercises the simplest subset of these values - the global
+            # access value, and with the 'ALL' value, which == 2. 1 is also
+            # valid ('GRANT'), though it should never come back in the current
+            # drupal.org implementation state.
+            if not user or not user["access"].in([1,2]):
+                error = "You do not have write permissions for the '{0}' repository.".format(projectname)
                 return Failure(ConchError(error))
-            elif not user["global"]:
-                # username:key
-                if fingerprint in user["ssh_keys"].values():
-                    return execGitCommand
-                # username:password
-                elif user["pass"] == password:
-                    return execGitCommand
-                else:
-                    # Both kinds of username auth failed
-                    error = "Permission denied when accessing '{0}' as user '{1}'".format(projectname, self.user.username)
-                    return Failure(ConchError(error))
-            else:
+            elif user["global"]:
                 # Account is globally disabled or disallowed
                 # 0x01 = no Git user role, but unknown reason (probably a bug!)
                 # 0x02 = Git account suspended
@@ -251,9 +243,14 @@ class GitSession(object):
                     # unknown situation, but be safe and error out
                     error = "This operation cannot be completed at this time.  It may be that we are experiencing technical difficulties or are currently undergoing maintenance."
                 return Failure(ConchError(error))
-        else:
-            # Read only command and anonymous access is enabled
-            return execGitCommand
+            else:
+                # last check ensuring either fingerprint or pw match
+                if fingerprint in user["ssh_keys"].values() or user["pass"] == password:
+                    return execGitCommand
+                else:
+                    # Both kinds of username auth failed
+                    error = "Permission denied when accessing '{0}' as user '{1}'".format(projectname, self.user.username)
+                    return Failure(ConchError(error))
 
     def errorHandler(self, fail, proto):
         """Catch any unhandled errors and send the exception string to the remote client."""

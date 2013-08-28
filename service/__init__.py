@@ -26,9 +26,19 @@ class Service(object):
         self.protocol.deferred.addCallback(self.convert_bool)
 
     def convert_json(self, raw):
+        def intify(d):
+            for k, v in d.iteritems():
+                if type(v) == dict:
+                    print 'found dict'
+                    d[k] = intify(v)
+                elif type(v) == unicode and v.isdigit():
+                    print 'found string {0}'.format(v)
+                    d[k] = int(v)
+            return d
+
         try:
             result = json.loads(raw)
-            return result
+            return intify(result)
         except ValueError:
             log.err("Protocol {0}:{1} returned bad JSON.".format(self.protocol.__class__, self.protocol.command))
 
