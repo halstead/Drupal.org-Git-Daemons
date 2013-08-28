@@ -214,6 +214,10 @@ class GitSession(object):
                 error = "Project {0} has been disabled.".format(projectname)
                 return Failure(ConchError(error))
             # Now, deny if the user isn't listed, or doesn't have push access.
+            # See http://drupalcode.org/project/versioncontrol.git/blob/refs/heads/6.x-2.x:/includes/plugins/vcs_auth/VersioncontrolAuthHandlerMappedAccounts.class.php
+            # for an explanation on the values used here. Drupal.org currently
+            # only exercises the simplest subset of these values - the global
+            # access value, and with the 'ALL' value, which == 2.
             if not user or user["access"] != 2:
                 error = "You do not have write permissions for the '{0}' repository.".format(projectname)
                 return Failure(ConchError(error))
