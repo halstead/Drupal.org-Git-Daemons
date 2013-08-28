@@ -204,8 +204,11 @@ class GitSession(object):
 
         # Check to see if anonymous read access is enabled and if
         # this is a read
-        if (not self.user.meta.anonymousReadAccess or \
-                'git-upload-pack' not in argv[:-1]):
+        if (self.user.meta.anonymousReadAccess and \
+                'git-upload-pack' in argv[:-1]):
+            # Read only command, and anonymous access is enabled
+            return execGitCommand
+        else:
             # First, error out if the project itself is disabled.
             if not auth_service["status"]:
                 error = "Project {0} has been disabled.".format(projectname)
@@ -251,9 +254,6 @@ class GitSession(object):
                     # unknown situation, but be safe and error out
                     error = "This operation cannot be completed at this time.  It may be that we are experiencing technical difficulties or are currently undergoing maintenance."
                 return Failure(ConchError(error))
-        else:
-            # Read only command and anonymous access is enabled
-            return execGitCommand
 
     def errorHandler(self, fail, proto):
         """Catch any unhandled errors and send the exception string to the remote client."""
