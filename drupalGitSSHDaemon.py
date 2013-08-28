@@ -308,11 +308,11 @@ class GitSession(object):
         self.pty = reactor.spawnProcess(proto, sh, (sh, '-c', command), env=env)
 
     def eofReceived(self):
-        if self.pty:
+        if hasattr(self, 'pty'):
             self.pty.closeStdin()
 
     def closed(self):
-        if self.pty:
+        if hasattr(self, 'pty'):
             try:
                 self.pty.signalProcess('HUP')
             except (OSError,ProcessExitedAlready):
