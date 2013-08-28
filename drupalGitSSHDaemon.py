@@ -6,6 +6,7 @@ import os
 import shlex
 import sys
 from twisted.conch.avatar import ConchUser
+from twisted.internet.error import ProcessExitedAlready
 from twisted.conch.error import ConchError, UnauthorizedLogin, ValidPublicKey
 from twisted.conch.ssh.channel import SSHChannel
 from twisted.conch.ssh.session import ISession, SSHSession, SSHSessionProcessProtocol
@@ -294,10 +295,15 @@ class GitSession(object):
         env = {}
         if user:
             # The UID is known, populate the environment
-            env['VERSION_CONTROL_GIT_UID'] = user["uid"]
-            env['VERSION_CONTROL_GIT_REPO_ID'] = repo_id
+            # Be positive that we only use strings in our command and environment since we
+            # cast everything we could to integers when loading JSON data
+            env['VERSION_CONTROL_GIT_UID'] = str(user["uid"])
+            env['VERSION_CONTROL_GIT_REPO_ID'] = str(repo_id)
             env['VERSION_CONTROL_VCS_AUTH_DATA'] = json.dumps(auth_service)
-            
+        
+        
+        argv = [str(e) for e in argv]
+        
         command = ' '.join(argv[:-1] + ["'{0}'".format(repopath)])
         self.pty = reactor.spawnProcess(proto, sh, (sh, '-c', command), env=env)
 
