@@ -217,8 +217,10 @@ class GitSession(object):
             # See http://drupalcode.org/project/versioncontrol.git/blob/refs/heads/6.x-2.x:/includes/plugins/vcs_auth/VersioncontrolAuthHandlerMappedAccounts.class.php
             # for an explanation on the values used here. Drupal.org currently
             # only exercises the simplest subset of these values - the global
-            # access value, and with the 'ALL' value, which == 2.
-            if not user or user["access"] != 2:
+            # access value, and with the 'ALL' value, which == 2. 1 is also
+            # valid ('GRANT'), though it should never come back in the current
+            # drupal.org implementation state.
+            if not user or not user["access"].in([1,2]):
                 error = "You do not have write permissions for the '{0}' repository.".format(projectname)
                 return Failure(ConchError(error))
             elif user["global"]:
