@@ -2,7 +2,7 @@
 
 Summary:    A TCP server for drupalGitSSHDaemon
 Name:       twisted-drupalGitSSHDaemon
-Version:    0.1.8
+Version:    0.1.9
 Release:    1
 License:    GPLv2
 Group:      Networking/Daemons
@@ -59,9 +59,10 @@ fi
 /etc/twisted-keys
 
 %changelog
+* Wed Aug 28 2013 Michael Halstead <halstead@happypunch.com>
+- Fix access bypass. Better error handling.
 * Fri Sep 14 2012 Jeff Sheltren <jeff@tag1consulting.com>
 - Various spec changes/improvements: use macros, add requires
-
 * Thu Aug 16 2012 Michael Halstead <halstead@happypunch.com>
 - Added compatiblity with PHPass style hashed passwords
 * Sun Feb 20 2011 Trevor Hardcastle <chizu@spicious.com>
